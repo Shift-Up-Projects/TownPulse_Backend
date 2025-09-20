@@ -83,15 +83,15 @@ app.use(errorGlobal);
 
 //4)
 mongoose
-  .connect(process.env.MONGO_URL)
-  .then((result) => {
-    app.listen(process.env.PORT, () => {
-      console.log(
-        ` app listening at http://localhost:${process.env.PORT}
-        app listening at http://localhost:${process.env.PORT}/docs`,
-      );
-    });
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+  .connect(process.env.DATABASE_LOCAL) // تم تعديل MONGO_URI إلى DATABASE_LOCAL
+  .then((result) => {
+    app.listen(process.env.PORT, () => {
+      console.log(
+        ` app listening at http://localhost:${process.env.PORT}
+        app listening at http://localhost:${process.env.PORT}/docs`,
+      );
+    });
+  })
+  .catch((err) => {
+    console.log(err);
+  });
