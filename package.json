@@ -1,13 +1,50 @@
 {
-  "name": "townplus",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+  "dependencies": {
+    "axios": "^1.9.0",
+    "bcryptjs": "^2.4.3",
+    "body-parser": "^1.20.2",
+    "compression": "^1.7.4",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "crypto": "^1.0.1",
+    "dotenv": "^16.3.1",
+    "ejs": "^3.1.9",
+    "express": "^4.21.2",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^7.1.1",
+    "helmet": "^7.0.0",
+    "hpp": "^0.2.3",
+    "html-to-text": "^9.0.5",
+    "jsonwebtoken": "^9.0.2",
+    "mailersend": "^2.3.0",
+    "mongoose": "^7.8.7",
+    "mongoose-autopopulate": "^1.0.1",
+    "mongoose-sequence": "^5.3.1",
+    "multer": "^1.4.5-lts.1",
+    "nodemailer": "^6.9.6",
+    "nodemon": "^3.0.1",
+    "prettier": "^3.5.3",
+    "pug": "^3.0.2",
+    "socket.io": "^4.8.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.0",
+    "uuid": "^13.0.0",
+    "validator": "^13.11.0",
+    "xss-clean": "^0.1.4"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "type": "commonjs"
+  "devDependencies": {
+    "hygen": "^6.2.11",
+    "morgan": "^1.10.0"
+  },
+  "scripts": {
+    "1": "hygen property add-to-document",
+    "start": "nodemon app.js",
+    " ": "node seeds.js",
+    "format": "prettier --write \"**/*.js\" ",
+    "generate:resource:document": "hygen generate document-resource",
+    "postgenerate:resource:document": "npm run format",
+    "add:property:object": "hygen property add-to-object",
+    "postadd:property:object": "npm run format",
+    "postadd:property:document": "npm run format"
+  }
 }
