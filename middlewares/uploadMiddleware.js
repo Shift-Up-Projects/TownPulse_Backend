@@ -5,34 +5,37 @@ const { v4: uuidv4 } = require('uuid');
 const uploadsDir = path.join(__dirname, '../uploads');
 const fs = require('fs');
 if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
+  fs.mkdirSync(uploadsDir, { recursive: true });
 }
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
+  destination: function (req, file, cb) {
     cb(null, uploadsDir);
-    },
-    filename: function (req, file, cb) {
+  },
+  filename: function (req, file, cb) {
     const uniqueName = `${uuidv4()}-${Date.now()}${path.extname(file.originalname)}`;
     cb(null, uniqueName);
-    }
+  },
 });
 
 // تصفية أنواع الملفات المسموحة
 const fileFilter = (req, file, cb) => {
-const allowedTypes = [
-    'image/jpeg', 
-    'image/png', 
-    'image/gif', 
-    'application/pdf', 
-    'application/zip', 
+  const allowedTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/gif',
+    'application/pdf',
+    'application/zip',
     'application/x-rar-compressed',
-    'text/plain'
+    'text/plain',
   ];
-  
+
   if (allowedTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('نوع الملف غير مدعوم. يرجى رفع صورة أو PDF أو ملف مضغوط'), false);
+    cb(
+      new Error('نوع الملف غير مدعوم. يرجى رفع صورة أو PDF أو ملف مضغوط'),
+      false,
+    );
   }
 };
 
@@ -41,7 +44,7 @@ const upload = multer({
   limits: {
     fileSize: 10 * 1024 * 1024, // 10MB كحد أقصى
   },
-  fileFilter: fileFilter
+  fileFilter: fileFilter,
 });
 
 module.exports = upload;

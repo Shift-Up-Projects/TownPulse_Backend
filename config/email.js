@@ -14,8 +14,8 @@ module.exports = class Email {
       service: 'Gmail',
       auth: {
         user: process.env.EMAIL_USERNAME,
-        pass: process.env.EMAIL_PASSWORD
-      }
+        pass: process.env.EMAIL_PASSWORD,
+      },
     });
   }
 
@@ -26,7 +26,7 @@ module.exports = class Email {
         from: this.from,
         to: this.to,
         subject,
-        text: this.url // إرسال الرابط كنص عادي فقط
+        text: this.url, // إرسال الرابط كنص عادي فقط
       };
 
       // 3) create transport and send email
