@@ -38,7 +38,7 @@
   },
   "scripts": {
     "1": "hygen property add-to-document",
-    "start": "nodemon app.js",
+    "start": "node app.js",
     " ": "node seeds.js",
     "format": "prettier --write \"**/*.js\" ",
     "generate:resource:document": "hygen generate document-resource",

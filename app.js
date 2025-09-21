@@ -14,28 +14,30 @@ const dotenv = require('dotenv').config();
 const AppError = require('./utils/appError');
 const errorGlobal = require('./controllers/errorController');
 
-// Start express app
+// بدء تطبيق Express
 const app = express();
-// 1) GLOBAL MIDDLEWARES
 
+// زيادة وقت الانتظار للطلبات (مهم لـ Render)
+app.timeout = 30000; // 30 ثانية
+
+// 1) MIDDLEWARES العامة
+
+// خدمة الملفات الثابتة
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-// Implement CORS
-app.use(cors());
 
-//السماح بالاتصال على جميع الموارد
+// تمكين CORS
+app.use(cors());
 app.options('*', cors());
 
-// Set security HTTP headers
-//مكتبة لحماية الموقع في حال الرفع على استضافة
+// أمان HTTP headers
 app.use(helmet());
 
-// Development logging
-//تتبع الطلبات في وضعية التطوير
+// تسجيل الطلبات في وضع التطوير
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
 }
-// Limit requests from same API
-// منع اغراق السرفر بطلبات وهمية
+
+// تحديد معدل الطلبات
 const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
@@ -43,55 +45,100 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// Body parser, reading data from body into req.body
-// منع استلام بينات كبيرة قادمة من الفرونت
+// تحليل الجسم من الطلبات
 app.use(express.json({ limit: '10kb' }));
 app.use(express.urlencoded({ extended: true, limit: '10kb' }));
-// القادم مع الطلب jwt لقرائة
 app.use(cookieParser());
+
+// إعدادات القوالب (إذا كنت تستخدمها)
 app.set('view engine', 'ejs');
 app.use(express.static('public'));
-// Data sanitization against NoSQL query injection
-// لمنع استلام بينات تشابه تعليمات قاعدة البيانات
+
+// الحماية من هجمات NoSQL injection
 app.use(mongoSanitize());
 
-// Data sanitization against XSS
-// html تعديل البيانات القادمة على شكل
+// الحماية من هجمات XSS
 app.use(xss());
 
-// Prevent parameter pollution
-// منع تكرار الحقول داخل الروت الى للحالات التالية
+// منع تلوث المعاملات
 app.use(
   hpp({
     whitelist: ['duration', 'difficulty', 'price'],
-  }),
+  })
 );
-//ضغط البيانات قبل ارسالها من اجل تسريع النقل
+
+// ضغط البيانات
 app.use(compression());
-//R <dont remove this line>
 
+// 2) ROUTES
 const userRouter = require('./routes/userRouter');
-
-//ROUTES <dont remove this line>
-
 app.use('/api/v1.0.0/users', userRouter);
-//في حال طلب مورد غير موجود
+
+// معالجة الروابط غير الموجودة
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
 });
+
+// معالجة الأخطاء العامة
 app.use(errorGlobal);
 
-//4)
+// 3) الاتصال بقاعدة البيانات وتشغيل الخادم
+const PORT = process.env.PORT || 3000;
+const MONGODB_URI = process.env.MONGO_URL;
+
+// التحقق من وجود رابط قاعدة البيانات
+if (!MONGODB_URI) {
+  console.error('MONGO_URL is not defined in environment variables');
+  process.exit(1);
+}
+
+// الاتصال بقاعدة البيانات
 mongoose
-  .connect(process.env.DATABASE_LOCAL) // تم تعديل MONGO_URI إلى DATABASE_LOCAL
-  .then((result) => {
-    app.listen(process.env.PORT, () => {
-      console.log(
-        ` app listening at http://localhost:${process.env.PORT}
-        app listening at http://localhost:${process.env.PORT}/docs`,
-      );
-    });
-  })
-  .catch((err) => {
-    console.log(err);
-  });
+  .connect(MONGODB_URI)
+  .then(() => {
+    console.log('Connected to MongoDB successfully');
+    
+    // تشغيل الخادم بعد الاتصال الناجح بقاعدة البيانات
+    const server = app.listen(PORT, '0.0.0.0', () => {
+      console.log(`Server is running on port ${PORT}`);
+      console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+    });
+
+    // إعدادات إضافية للخادم
+    server.keepAliveTimeout = 120000; // 120 ثانية
+    server.headersTimeout = 120000; // 120 ثانية
+  })
+  .catch((err) => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
+  });
+
+// 4) الإغلاق الأنظف للتطبيق
+process.on('SIGINT', () => {
+  console.log('Received SIGINT. Shutting down gracefully');
+  mongoose.connection.close(() => {
+    console.log('MongoDB connection closed');
+    process.exit(0);
+  });
+});
+
+process.on('SIGTERM', () => {
+  console.log('Received SIGTERM. Shutting down gracefully');
+  mongoose.connection.close(() => {
+    console.log('MongoDB connection closed');
+    process.exit(0);
+  });
+});
+
+// 5) معالجة الأخطاء غير الملتقطة
+process.on('uncaughtException', (err) => {
+  console.error('Uncaught Exception:', err);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
+});
+
+module.exports = app;
