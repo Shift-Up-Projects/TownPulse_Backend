@@ -85,7 +85,7 @@ app.use(errorGlobal);
 mongoose
   .connect(process.env.MONGO_URL)
   .then((result) => {
-    app.listen(process.env.PORT, () => {
+    app.listen(process.env.PORT, '0.0.0.0', () => {
       console.log(
         ` app listening at http://localhost:${process.env.PORT}
         app listening at http://localhost:${process.env.PORT}/docs`,
