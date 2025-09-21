@@ -2,7 +2,7 @@ const crypto = require('crypto');
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
-
+const { RoleCode, levelEnum } = require('../utils/enum');
 const userSchema = new mongoose.Schema(
   {
     name: {
@@ -16,6 +16,12 @@ const userSchema = new mongoose.Schema(
       unique: true,
       lowercase: true,
       validate: [validator.isEmail, 'Please provide a valid email'],
+    },
+
+    role: {
+      type: String,
+      enum: Object.values(RoleCode),
+      default: 'USER',
     },
     password: {
       type: String,
