@@ -1,4 +1,5 @@
 const catchAsync = require('./catchAsync');
+const { successResponse, errorResponse } = require('../utils/response');
 const AppError = require('./appError');
 const APIFeatures = require('./apiFeatures');
 exports.deleteOne = (Model) =>
@@ -7,11 +8,13 @@ exports.deleteOne = (Model) =>
     if (!doc) {
       return next(new AppError('No document found with that ID', 404));
     }
-    res.status(200).json({
-      status: 'success',
-      data: null,
-    });
-  });
+      return successResponse(
+        res, 
+        200, 
+        'success', 
+        doc
+    );
+  });
 exports.delete = (Model, filter) =>
   catchAsync(async (req, res, next) => {
     const doc = await Model.deleteMany(filter);
@@ -32,15 +35,17 @@ exports.updateOne = (Model) =>
     if (!doc) {
       return next(new AppError('No document found with that ID', 404));
     }
-    res.status(200).json({
-      status: 'success',
-      doc,
-    });
-  });
+     return successResponse(
+        res, 
+        200, 
+        'success', 
+        doc
+    );
+  });
 exports.update = (Model, filter, update) =>
   catchAsync(async (req, res, next) => {
     const doc = await Model.updateMany(filter, update);
-    res.status(200).json({
+  res.status(200).json({
       status: 'success',
       doc,
     });
@@ -48,7 +53,7 @@ exports.update = (Model, filter, update) =>
 exports.delete = (Model, filter) =>
   catchAsync(async (req, res, next) => {
     const doc = await Model.updateMany(filter);
-    res.status(200).json({
+   res.status(200).json({
       status: 'success',
       doc,
     });
@@ -56,11 +61,13 @@ exports.delete = (Model, filter) =>
 exports.createOne = (Model) =>
   catchAsync(async (req, res, next) => {
     const doc = await Model.create(req.body);
-    res.status(201).json({
-      status: 'success',
-      doc,
-    });
-  });
+     return successResponse(
+        res, 
+        200, 
+        'success', 
+        doc
+    );
+  });
 exports.getOne = (Model, ...popOptions) =>
   catchAsync(async (req, res, next) => {
     let query = Model.findById(req.params.id);
@@ -71,28 +78,34 @@ exports.getOne = (Model, ...popOptions) =>
     if (!doc) {
       return next(new AppError('No document found with that ID', 404));
     }
-    res.status(200).json({
-      status: 'success',
-      doc,
-    });
-  });
+      return successResponse(
+        res, 
+        200, 
+        'success', 
+        doc
+    );
+  });
 exports.getAll = (Model) =>
-  catchAsync(async (req, res, next) => {
-    let features =
-      !req.query.agg && !req.query.aggDate
-        ? new APIFeatures(Model.find(), req.query)
-            .filter()
-            .sort()
-            .limitFields()
-            .paginate()
-        : new APIFeatures(Model, req.query).agg().aggDate();
-    const doc = await features.query;
-    res.status(200).json({
-      status: 'success',
-      results: doc.length,
-      doc,
+    catchAsync(async (req, res, next) => {
+        let features =
+            !req.query.agg && !req.query.aggDate
+                ? new APIFeatures(Model.find(), req.query)
+                    .filter()
+                    .sort()
+                    .limitFields()
+                    .paginate()
+                : new APIFeatures(Model, req.query).agg().aggDate();
+
+        const doc = await features.query;
+
+        // 🚀 التعديل هنا: نستخدم 'success' متبوعاً بعدد المستندات
+        return successResponse(
+            res, 
+            200, 
+            `success, عدد المستندات ${doc.length}`, // 👈🏽 الرسالة المطلوبة
+            doc // المستندات نفسها في حقل 'data'
+        );
     });
-  });
 exports.getAllpop = (Model, pop) =>
   catchAsync(async (req, res, next) => {
     let fullter = {};
