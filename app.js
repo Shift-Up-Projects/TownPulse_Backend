@@ -14,10 +14,8 @@ const dotenv = require('dotenv').config();
 const AppError = require('./utils/appError');
 const errorGlobal = require('./controllers/errorController');
 
-// بدء تطبيق Express
 const app = express();
 
-// زيادة وقت الانتظار للطلبات (مهم لـ Render)
 app.timeout = 30000; // 30 ثانية
 
 // 1) MIDDLEWARES العامة
@@ -64,7 +62,7 @@ app.use(xss());
 app.use(
   hpp({
     whitelist: ['duration', 'difficulty', 'price'],
-  })
+  }),
 );
 
 // ضغط البيانات
@@ -72,7 +70,10 @@ app.use(compression());
 
 // 2) ROUTES
 const userRouter = require('./routes/userRouter');
+const activityRoutes = require('./routes/activityRoutes');
+
 app.use('/api/v1.0.0/users', userRouter);
+app.use('/api/v1.0.0/activity', activityRoutes);
 
 // معالجة الروابط غير الموجودة
 app.all('*', (req, res, next) => {
@@ -97,7 +98,7 @@ mongoose
   .connect(MONGODB_URI)
   .then(() => {
     console.log('Connected to MongoDB successfully');
-    
+
     // تشغيل الخادم بعد الاتصال الناجح بقاعدة البيانات
     const server = app.listen(PORT, '0.0.0.0', () => {
       console.log(`Server is running on port ${PORT}`);

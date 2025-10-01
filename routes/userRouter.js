@@ -54,5 +54,5 @@ router
     authMiddlewers.restrictTo('ADMIN'),
     userController.deleteUser, //حذف مستخدم معين
   );
-  
+
 module.exports = router;
