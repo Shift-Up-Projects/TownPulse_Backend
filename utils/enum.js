@@ -1,13 +1,37 @@
 exports.UserStatus = {
-  active: 'active',
-  disactive: 'disactive',
+  ACTIVE: 'active',
+  INACTIVE: 'inactive',
 };
+
 exports.RoleCode = {
   USER: 'USER',
   ADMIN: 'ADMIN',
+  ORGANIZER: 'ORGANIZER',
 };
+
+exports.ActivityStatus = {
+  DRAFT: 'DRAFT',
+  UPCOMING: 'UPCOMING',
+  ONGOING: 'ONGOING',
+  COMPLETED: 'COMPLETED',
+  CANCELLED: 'CANCELLED',
+};
+
+
+exports.CategoryType = {
+  MUSIC: 'MUSIC',
+  SPORTS: 'SPORTS',
+  ART: 'ART',
+  EDUCATION: 'EDUCATION',
+  BUSINESS: 'BUSINESS',
+  TECHNOLOGY: 'TECHNOLOGY',
+  FOOD: 'FOOD',
+  TRAVEL: 'TRAVEL',
+  OTHER: 'OTHER',
+};
+
 exports.Env = {
-  production: 'production',
-  development: 'development',
-  test: 'test',
+  PRODUCTION: 'production',
+  DEVELOPMENT: 'development',
+  TEST: 'test',
 };

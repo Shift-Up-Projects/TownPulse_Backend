@@ -8,12 +8,12 @@
  * @param {any} data - البيانات الفعلية التي تم طلبها
  */
 exports.successResponse = (res, statusCode, message, data) => {
-    return res.status(statusCode).json({
-        isSuccess: true, // ثابت: نجاح
-        message: message,
-        statusCode: statusCode,
-        data: data // البيانات المطلوبة هنا
-    });
+  return res.status(statusCode).json({
+    isSuccess: true, // ثابت: نجاح
+    message: message,
+    statusCode: statusCode,
+    data: data, // البيانات المطلوبة هنا
+  });
 };
 
 /**
@@ -23,10 +23,10 @@ exports.successResponse = (res, statusCode, message, data) => {
  * @param {string} message - رسالة الخطأ
  */
 exports.errorResponse = (res, statusCode, message) => {
-    return res.status(statusCode).json({
-        isSuccess: false, // ثابت: فشل
-        message: message,
-        statusCode: statusCode,
-        data: null // في حالة الخطأ، لا يوجد بيانات (أو كائن فارغ {})
-    });
+  return res.status(statusCode).json({
+    isSuccess: false, // ثابت: فشل
+    message: message,
+    statusCode: statusCode,
+    data: null, // في حالة الخطأ، لا يوجد بيانات (أو كائن فارغ {})
+  });
 };
