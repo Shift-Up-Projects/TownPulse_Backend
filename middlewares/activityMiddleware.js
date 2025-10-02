@@ -30,24 +30,24 @@ const validateActivityDates = (startDate, endDate) => {
   const end = new Date(endDate);
 
   if (start < now) {
-    return 'تاريخ البدء لا يمكن أن يكون في الماضي';
+    return 'The start date cannot be in the past';
   }
 
   if (end <= start) {
-    return 'تاريخ الانتهاء يجب أن يكون بعد تاريخ البدء';
+    return 'The end date must be after the start date';
   }
 
   return null;
 };
 
-// ✅ التحقق من ملكية الفعالية
+//  التحقق من ملكية الفعالية
 exports.checkActivityOwner = catchAsync(async (req, res, next) => {
   const activity = await Activity.findById(req.params.id);
 
   if (!activity) {
     return res.status(404).json({
       isSuccess: false,
-      message: 'الفعالية غير موجودة',
+      message: 'Effectiveness not found',
       statusCode: 404,
       data: null,
     });
@@ -56,7 +56,7 @@ exports.checkActivityOwner = catchAsync(async (req, res, next) => {
   if (activity.creator.toString() !== req.user._id.toString()) {
     return res.status(403).json({
       isSuccess: false,
-      message: 'غير مصرح لك بتعديل هذه الفعالية',
+      message:'You are not authorized to edit this event.',
       statusCode: 403,
       data: null,
     });
@@ -66,14 +66,14 @@ exports.checkActivityOwner = catchAsync(async (req, res, next) => {
   next();
 });
 
-// ✅ التحقق من وجود الفعالية
+// التحقق من وجود الفعالية
 exports.checkActivityExists = catchAsync(async (req, res, next) => {
   const activity = await Activity.findById(req.params.id);
 
   if (!activity) {
     return res.status(404).json({
       isSuccess: false,
-      message: 'الفعالية غير موجودة',
+      message: 'Effectiveness not found',
       statusCode: 404,
       data: null,
     });
@@ -83,7 +83,7 @@ exports.checkActivityExists = catchAsync(async (req, res, next) => {
   next();
 });
 
-// ✅ التحقق من صحة الإحداثيات
+//  التحقق من صحة الإحداثيات
 exports.validateCoordinates = catchAsync(async (req, res, next) => {
   const { lat, lng } = req.query;
 
@@ -103,7 +103,7 @@ exports.validateCoordinates = catchAsync(async (req, res, next) => {
     if (isNaN(longitude) || longitude < -180 || longitude > 180) {
       return res.status(400).json({
         isSuccess: false,
-        message: 'قيمة خط الطول غير صالحة',
+        message: 'Invalid longitude value',
         statusCode: 400,
         data: null,
       });
@@ -113,7 +113,7 @@ exports.validateCoordinates = catchAsync(async (req, res, next) => {
   next();
 });
 
-// ✅ التحقق من الحقول المطلوبة لإنشاء فعالية
+//  التحقق من الحقول المطلوبة لإنشاء فعالية
 exports.validateCreateActivity = catchAsync(async (req, res, next) => {
   const requiredFields = [
     'title',
@@ -131,7 +131,7 @@ exports.validateCreateActivity = catchAsync(async (req, res, next) => {
   if (missingFields.length > 0) {
     return res.status(400).json({
       isSuccess: false,
-      message: `الحقول المطلوبة مفقودة: ${missingFields.join(', ')}`,
+      message: `Required fields are missing: ${missingFields.join(', ')}`,
       statusCode: 400,
       data: null,
     });
@@ -141,7 +141,7 @@ exports.validateCreateActivity = catchAsync(async (req, res, next) => {
   if (!Object.values(CategoryType).includes(req.body.category)) {
     return res.status(400).json({
       isSuccess: false,
-      message: `الفئة غير صالحة. يجب أن تكون واحدة من: ${Object.values(CategoryType).join(', ')}`,
+      message: `Invalid category. Must be one of: ${Object.values(CategoryType).join(', ')}`,
       statusCode: 400,
       data: null,
     });
@@ -164,7 +164,7 @@ exports.validateCreateActivity = catchAsync(async (req, res, next) => {
     if (isNaN(latitude) || latitude < -90 || latitude > 90) {
       return res.status(400).json({
         isSuccess: false,
-        message: 'خط العرض يجب أن يكون رقم صحيح بين -90 و 90',
+        message: 'Latitude must be an integer between -90 and 90',
         statusCode: 400,
         data: null,
       });
@@ -176,7 +176,7 @@ exports.validateCreateActivity = catchAsync(async (req, res, next) => {
     if (isNaN(longitude) || longitude < -180 || longitude > 180) {
       return res.status(400).json({
         isSuccess: false,
-        message: 'خط الطول يجب أن يكون رقم صحيح بين -180 و 180',
+        message: 'Longitude must be an integer between -180 and 180',
         statusCode: 400,
         data: null,
       });
@@ -187,7 +187,7 @@ exports.validateCreateActivity = catchAsync(async (req, res, next) => {
   if (req.body.price < 0) {
     return res.status(400).json({
       isSuccess: false,
-      message: 'السعر لا يمكن أن يكون سالب',
+      message: 'The price cannot be negative.',
       statusCode: 400,
       data: null,
     });
@@ -196,7 +196,7 @@ exports.validateCreateActivity = catchAsync(async (req, res, next) => {
   if (req.body.capacity < 1) {
     return res.status(400).json({
       isSuccess: false,
-      message: 'السعة يجب أن تكون على الأقل 1',
+      message: 'Capacity must be at least 1',
       statusCode: 400,
       data: null,
     });
@@ -205,7 +205,7 @@ exports.validateCreateActivity = catchAsync(async (req, res, next) => {
   next();
 });
 
-// ✅ التحقق من صحة البيانات للتحديث
+//  التحقق من صحة البيانات للتحديث
 exports.validateUpdateActivity = catchAsync(async (req, res, next) => {
   const allowedFields = [
     'title', 'description', 'location', 'map_url', 
@@ -307,14 +307,14 @@ exports.validateUpdateActivity = catchAsync(async (req, res, next) => {
   next();
 });
 
-// ✅ التحقق من صحة معرّف المستخدم
+
 exports.validateUserId = catchAsync(async (req, res, next) => {
   const { userId } = req.params;
 
   if (!userId || userId.length !== 24) {
     return res.status(400).json({
       isSuccess: false,
-      message: 'معرّف المستخدم غير صالح',
+      message: 'Invalid user ID',
       statusCode: 400,
       data: null,
     });
@@ -347,7 +347,7 @@ exports.restrictToAdmin = catchAsync(async (req, res, next) => {
   next();
 });
 
-// ✅ التحقق من صحة معاملات الاستعلام
+
 exports.validateQueryParams = catchAsync(async (req, res, next) => {
   const { page, limit, status, category } = req.query;
 
@@ -355,7 +355,7 @@ exports.validateQueryParams = catchAsync(async (req, res, next) => {
   if (page && (isNaN(page) || parseInt(page) < 1)) {
     return res.status(400).json({
       isSuccess: false,
-      message: 'رقم الصفحة يجب أن يكون رقم صحيح موجب',
+      message: 'Page number must be a positive integer',
       statusCode: 400,
       data: null,
     });
@@ -365,7 +365,7 @@ exports.validateQueryParams = catchAsync(async (req, res, next) => {
   if (limit && (isNaN(limit) || parseInt(limit) < 1 || parseInt(limit) > 100)) {
     return res.status(400).json({
       isSuccess: false,
-      message: 'الحد يجب أن يكون بين 1 و 100',
+      message:'The limit must be between 1 and 100.',
       statusCode: 400,
       data: null,
     });
@@ -375,7 +375,7 @@ exports.validateQueryParams = catchAsync(async (req, res, next) => {
   if (status && !['upcoming', 'past', 'ongoing', 'all'].includes(status)) {
     return res.status(400).json({
       isSuccess: false,
-      message: 'الحالة يجب أن تكون: upcoming, past, ongoing, all',
+      message: 'Status must be: upcoming, past, ongoing, all',
       statusCode: 400,
       data: null,
     });
@@ -385,7 +385,7 @@ exports.validateQueryParams = catchAsync(async (req, res, next) => {
   if (category && !Object.values(CategoryType).includes(category)) {
     return res.status(400).json({
       isSuccess: false,
-      message: `الفئة يجب أن تكون واحدة من: ${Object.values(CategoryType).join(', ')}`,
+      message: `The category must be one of: ${Object.values(CategoryType).join(', ')}`,
       statusCode: 400,
       data: null,
     });
@@ -394,14 +394,14 @@ exports.validateQueryParams = catchAsync(async (req, res, next) => {
   next();
 });
 
-// ✅ التحقق من صحة إحداثيات البحث القريب
+//  التحقق من صحة إحداثيات البحث القريب
 exports.validateNearbySearch = catchAsync(async (req, res, next) => {
   const { lat, lng, maxDistance = 10 } = req.query;
 
   if (!lat || !lng) {
     return res.status(400).json({
       isSuccess: false,
-      message: 'يجب تقديم خط العرض وخط الطول',
+      message:'Latitude and longitude must be provided.',
       statusCode: 400,
       data: null,
     });
@@ -414,7 +414,7 @@ exports.validateNearbySearch = catchAsync(async (req, res, next) => {
   if (isNaN(latitude) || isNaN(longitude) || isNaN(distance)) {
     return res.status(400).json({
       isSuccess: false,
-      message: 'الإحداثيات أو المسافة غير صالحة',
+      message: 'Invalid coordinates or distance',
       statusCode: 400,
       data: null,
     });
@@ -423,7 +423,7 @@ exports.validateNearbySearch = catchAsync(async (req, res, next) => {
   if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
     return res.status(400).json({
       isSuccess: false,
-      message: 'الإحداثيات خارج النطاق المسموح',
+      message: 'Coordinates outside the allowed range',
       statusCode: 400,
       data: null,
     });
@@ -432,7 +432,7 @@ exports.validateNearbySearch = catchAsync(async (req, res, next) => {
   if (distance < 0.1 || distance > 100) {
     return res.status(400).json({
       isSuccess: false,
-      message: 'المسافة يجب أن تكون بين 0.1 و 100 كيلومتر',
+      message:'The distance should be between 0.1 and 100 kilometers.',
       statusCode: 400,
       data: null,
     });
@@ -441,14 +441,14 @@ exports.validateNearbySearch = catchAsync(async (req, res, next) => {
   next();
 });
 
-// ✅ التحقق من صحة معاملات البحث
+// التحقق من صحة معاملات البحث
 exports.validateSearchParams = catchAsync(async (req, res, next) => {
   const { q, page, limit } = req.query;
 
   if (!q || q.trim() === '') {
     return res.status(400).json({
       isSuccess: false,
-      message: 'كلمة البحث مطلوبة',
+      message: 'Search word required',
       statusCode: 400,
       data: null,
     });
@@ -457,7 +457,7 @@ exports.validateSearchParams = catchAsync(async (req, res, next) => {
   if (q.trim().length < 2) {
     return res.status(400).json({
       isSuccess: false,
-      message: 'كلمة البحث يجب أن تكون على الأقل حرفين',
+      message: 'Search word must be at least two letters',
       statusCode: 400,
       data: null,
     });
@@ -467,7 +467,7 @@ exports.validateSearchParams = catchAsync(async (req, res, next) => {
   if (page && (isNaN(page) || parseInt(page) < 1)) {
     return res.status(400).json({
       isSuccess: false,
-      message: 'رقم الصفحة يجب أن يكون رقم صحيح موجب',
+      message: 'Page number must be a positive integer',
       statusCode: 400,
       data: null,
     });
@@ -477,7 +477,7 @@ exports.validateSearchParams = catchAsync(async (req, res, next) => {
   if (limit && (isNaN(limit) || parseInt(limit) < 1 || parseInt(limit) > 50)) {
     return res.status(400).json({
       isSuccess: false,
-      message: 'الحد يجب أن يكون بين 1 و 50',
+      message: 'The limit must be between 1 and 50.',
       statusCode: 400,
       data: null,
     });

@@ -4,7 +4,7 @@ const activityController = require('../controllers/activityController');
 const authMiddlewers = require('../middlewares/authMiddlewers');
 const activityMiddleware = require('../middlewares/activityMiddleware');
 
-// ✅ تطبيق المصادقة على جميع المسارات
+
 router.use(authMiddlewers.protect);
 
 router.get(

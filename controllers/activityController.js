@@ -56,46 +56,42 @@ exports.createActivity = catchAsync(async (req, res, next) => {
 exports.getNearbyActivities = catchAsync(async (req, res, next) => {
   const { lat, lng, maxDistance = 10, page = 1, limit = 10 } = req.query;
 
-  // التحقق من وجود الإحداثيات
   if (!lat || !lng) {
-    return next(new AppError('يجب تقديم خط العرض وخط الطول', 400));
+    return next(new AppError('Latitude and longitude must be provided.', 400));
   }
 
-  // التحقق من صحة الإحداثيات
   const latitude = parseFloat(lat);
   const longitude = parseFloat(lng);
   const distance = parseFloat(maxDistance);
 
   if (isNaN(latitude) || isNaN(longitude) || isNaN(distance)) {
-    return next(new AppError('الإحداثيات أو المسافة غير صالحة', 400));
+    return next(new AppError('Invalid coordinates or distance', 400));
   }
 
   if (latitude < -90 || latitude > 90 || longitude < -180 || longitude > 180) {
-    return next(new AppError('الإحداثيات خارج النطاق المسموح', 400));
+    return next(new AppError('Coordinates outside the allowed range', 400));
   }
 
-  // حساب skip لل pagination
+
   const pageNum = parseInt(page);
   const limitNum = parseInt(limit);
   const skip = (pageNum - 1) * limitNum;
 
-  // البحث عن الفعاليات القريبة
+
   const activities = await Activity.find({
     latitude: { $exists: true, $ne: null },
     longitude: { $exists: true, $ne: null },
-    start_date: { $gte: new Date() } // فقط الفعاليات المستقبلية
+    start_date: { $gte: new Date() } 
   })
-  .where('latitude').gte(latitude - (distance / 111.32)) // 1 درجة ≈ 111.32 كم
+  .where('latitude').gte(latitude - (distance / 111.32)) 
   .where('latitude').lte(latitude + (distance / 111.32))
   .where('longitude').gte(longitude - (distance / (111.32 * Math.cos(latitude * Math.PI / 180))))
   .where('longitude').lte(longitude + (distance / (111.32 * Math.cos(latitude * Math.PI / 180))))
   .populate('creator', 'name email profile_image')
-  .populate('participants', 'name email profile_image')
   .sort({ start_date: 1 })
   .limit(limitNum)
   .skip(skip);
 
-  // حساب العدد الكلي للنتائج
   const total = await Activity.countDocuments({
     latitude: { $exists: true, $ne: null },
     longitude: { $exists: true, $ne: null },
@@ -107,7 +103,7 @@ exports.getNearbyActivities = catchAsync(async (req, res, next) => {
     }
   });
 
-  // حساب المسافات التقريبية
+
   const activitiesWithDistance = activities.map(activity => {
     const distance = calculateDistance(
       latitude,
@@ -118,16 +114,16 @@ exports.getNearbyActivities = catchAsync(async (req, res, next) => {
     
     return {
       ...activity.toObject(),
-      distance: Math.round(distance * 10) / 10 // تقريب لرقم عشري واحد
+      distance: Math.round(distance * 10) / 10 
     };
   });
 
-  // ترتيب حسب المسافة
+  
   activitiesWithDistance.sort((a, b) => a.distance - b.distance);
 
   res.status(200).json({
     isSuccess: true,
-    message: `تم العثور على ${activitiesWithDistance.length} فعالية قريبة`,
+    message:'${activitiesWithDistance.length} activity found nearby',
     statusCode: 200,
     data: {
       activities: activitiesWithDistance,
@@ -185,7 +181,7 @@ exports.getMyActivities = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     isSuccess: true,
-    message: `تم جلب ${activities.length} من فعالياتك`,
+    message: '${activities.length} was fetched from your activities.',
     statusCode: 200,
     data: {
       activities,
@@ -242,7 +238,7 @@ exports.getUserActivities = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     isSuccess: true,
-    message: `تم جلب ${activities.length} فعالية للمستخدم`,
+    message:`${activities.length} activity fetched for user`,
     statusCode: 200,
     data: {
       activities,
