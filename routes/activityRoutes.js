@@ -15,7 +15,7 @@ router.get(
 
 router.get(
   '/user/:userId/activities',
-  authMiddlewers.restrictTo('ADMIN'),
+  authMiddlewers.restrictTo('ADMIN', 'USER'),
   activityMiddleware.validateUserId,
   activityMiddleware.validateQueryParams,
   activityController.getUserActivities
