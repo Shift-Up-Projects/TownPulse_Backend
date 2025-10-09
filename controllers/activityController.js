@@ -2,13 +2,13 @@ const Activity = require('../models/activityModel');
 const { CategoryType } = require('../utils/enum');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require('./../utils/appError');
-const calculateDistance=require('../middlewares/activityMiddleware')
+const calculateDistance = require('../middlewares/activityMiddleware');
 const factory = require('../utils/handlerFactory');
 
 exports.getAllActivities = factory.getAll(Activity);
 exports.getActivity = factory.getOne(Activity, {
   path: 'creator',
-  select: 'name email profile_image'
+  select: 'name email profile_image',
 });
 exports.updateActivity = factory.updateOne(Activity);
 exports.deleteActivity = factory.deleteOne(Activity);
@@ -43,8 +43,10 @@ exports.createActivity = catchAsync(async (req, res, next) => {
     category: category,
     creator: req.user._id,
   });
-  const populatedActivity = await Activity.findById(activity._id)
-    .populate('creator', 'name email profile_image');
+  const populatedActivity = await Activity.findById(activity._id).populate(
+    'creator',
+    'name email profile_image',
+  );
   res.status(201).json({
     isSuccess: true,
     message: 'Activity created successfully',
@@ -72,58 +74,63 @@ exports.getNearbyActivities = catchAsync(async (req, res, next) => {
     return next(new AppError('Coordinates outside the allowed range', 400));
   }
 
-
   const pageNum = parseInt(page);
   const limitNum = parseInt(limit);
   const skip = (pageNum - 1) * limitNum;
 
-
   const activities = await Activity.find({
     latitude: { $exists: true, $ne: null },
     longitude: { $exists: true, $ne: null },
-    start_date: { $gte: new Date() } 
+    start_date: { $gte: new Date() },
   })
-  .where('latitude').gte(latitude - (distance / 111.32)) 
-  .where('latitude').lte(latitude + (distance / 111.32))
-  .where('longitude').gte(longitude - (distance / (111.32 * Math.cos(latitude * Math.PI / 180))))
-  .where('longitude').lte(longitude + (distance / (111.32 * Math.cos(latitude * Math.PI / 180))))
-  .populate('creator', 'name email profile_image')
-  .sort({ start_date: 1 })
-  .limit(limitNum)
-  .skip(skip);
+    .where('latitude')
+    .gte(latitude - distance / 111.32)
+    .where('latitude')
+    .lte(latitude + distance / 111.32)
+    .where('longitude')
+    .gte(longitude - distance / (111.32 * Math.cos((latitude * Math.PI) / 180)))
+    .where('longitude')
+    .lte(longitude + distance / (111.32 * Math.cos((latitude * Math.PI) / 180)))
+    .populate('creator', 'name email profile_image')
+    .sort({ start_date: 1 })
+    .limit(limitNum)
+    .skip(skip);
 
   const total = await Activity.countDocuments({
     latitude: { $exists: true, $ne: null },
     longitude: { $exists: true, $ne: null },
     start_date: { $gte: new Date() },
-    latitude: { $gte: latitude - (distance / 111.32), $lte: latitude + (distance / 111.32) },
-    longitude: { 
-      $gte: longitude - (distance / (111.32 * Math.cos(latitude * Math.PI / 180))), 
-      $lte: longitude + (distance / (111.32 * Math.cos(latitude * Math.PI / 180))) 
-    }
+    latitude: {
+      $gte: latitude - distance / 111.32,
+      $lte: latitude + distance / 111.32,
+    },
+    longitude: {
+      $gte:
+        longitude - distance / (111.32 * Math.cos((latitude * Math.PI) / 180)),
+      $lte:
+        longitude + distance / (111.32 * Math.cos((latitude * Math.PI) / 180)),
+    },
   });
 
-
-  const activitiesWithDistance = activities.map(activity => {
+  const activitiesWithDistance = activities.map((activity) => {
     const distance = calculateDistance(
       latitude,
       longitude,
       activity.latitude,
-      activity.longitude
+      activity.longitude,
     );
-    
+
     return {
       ...activity.toObject(),
-      distance: Math.round(distance * 10) / 10 
+      distance: Math.round(distance * 10) / 10,
     };
   });
 
-  
   activitiesWithDistance.sort((a, b) => a.distance - b.distance);
 
   res.status(200).json({
     isSuccess: true,
-    message:'${activitiesWithDistance.length} activity found nearby',
+    message: '${activitiesWithDistance.length} activity found nearby',
     statusCode: 200,
     data: {
       activities: activitiesWithDistance,
@@ -132,14 +139,14 @@ exports.getNearbyActivities = catchAsync(async (req, res, next) => {
         totalPages: Math.ceil(total / limitNum),
         totalActivities: total,
         hasNext: pageNum * limitNum < total,
-        hasPrev: pageNum > 1
+        hasPrev: pageNum > 1,
       },
       searchLocation: {
         latitude: latitude,
         longitude: longitude,
-        maxDistance: distance
-      }
-    }
+        maxDistance: distance,
+      },
+    },
   });
 });
 exports.getMyActivities = catchAsync(async (req, res, next) => {
@@ -190,13 +197,13 @@ exports.getMyActivities = catchAsync(async (req, res, next) => {
         totalPages: Math.ceil(total / limitNum),
         totalActivities: total,
         hasNext: pageNum * limitNum < total,
-        hasPrev: pageNum > 1
+        hasPrev: pageNum > 1,
       },
       filters: {
         status: status || 'all',
-        category: category || 'all'
-      }
-    }
+        category: category || 'all',
+      },
+    },
   });
 });
 exports.getUserActivities = catchAsync(async (req, res, next) => {
@@ -221,7 +228,6 @@ exports.getUserActivities = catchAsync(async (req, res, next) => {
     filter.category = category;
   }
 
-
   const pageNum = parseInt(page);
   const limitNum = parseInt(limit);
   const skip = (pageNum - 1) * limitNum;
@@ -238,7 +244,7 @@ exports.getUserActivities = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     isSuccess: true,
-    message:`${activities.length} activity fetched for user`,
+    message: `${activities.length} activity fetched for user`,
     statusCode: 200,
     data: {
       activities,
@@ -247,15 +253,15 @@ exports.getUserActivities = catchAsync(async (req, res, next) => {
         totalPages: Math.ceil(total / limitNum),
         totalActivities: total,
         hasNext: pageNum * limitNum < total,
-        hasPrev: pageNum > 1
+        hasPrev: pageNum > 1,
       },
       userInfo: {
-        userId: userId
+        userId: userId,
       },
       filters: {
         status: status || 'all',
-        category: category || 'all'
-      }
-    }
+        category: category || 'all',
+      },
+    },
   });
 });

@@ -11,11 +11,11 @@ const createReview = asyncHandler(async (req, res) => {
     res.status(404);
     throw new Error('Activity not found');
   }
-  const existingReview = await Review.findOne({ 
-    user_id, 
-    activity_id 
+  const existingReview = await Review.findOne({
+    user_id,
+    activity_id,
   });
-  
+
   if (existingReview) {
     res.status(400);
     throw new Error('You have already reviewed this activity');
@@ -25,27 +25,27 @@ const createReview = asyncHandler(async (req, res) => {
     user_id,
     activity_id,
     rating,
-    comment
+    comment,
   });
 
   await review.populate('user_id', 'name email');
 
   res.status(201).json({
     isSuccess: true,
-    message: "success, Review created successfully",
+    message: 'success, Review created successfully',
     statusCode: 201,
-    data: review
+    data: review,
   });
 });
 
 const getAllReviews = asyncHandler(async (req, res) => {
   const { activity_id, user_id, page = 1, limit = 10 } = req.query;
   let filter = {};
-  
+
   if (activity_id) {
     filter.activity_id = activity_id;
   }
-  
+
   if (user_id) {
     filter.user_id = user_id;
   }
@@ -64,7 +64,7 @@ const getAllReviews = asyncHandler(async (req, res) => {
     isSuccess: true,
     message: `Success, number of documents ${count}`,
     statusCode: 200,
-    data: reviews
+    data: reviews,
   });
 });
 
@@ -80,9 +80,9 @@ const getOneReview = asyncHandler(async (req, res) => {
 
   res.json({
     isSuccess: true,
-    message: "success, Review retrieved successfully",
+    message: 'success, Review retrieved successfully',
     statusCode: 200,
-    data: review
+    data: review,
   });
 });
 
@@ -105,23 +105,24 @@ const updateReview = asyncHandler(async (req, res) => {
 
   review = await Review.findByIdAndUpdate(
     req.params.id,
-    { 
-      rating, 
+    {
+      rating,
       comment,
-      updated_at: Date.now()
+      updated_at: Date.now(),
     },
-    { 
-      new: true, 
-      runValidators: true 
-    }
-  ).populate('user_id', 'name email')
-   .populate('activity_id', 'title');
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
+    .populate('user_id', 'name email')
+    .populate('activity_id', 'title');
 
   res.json({
     isSuccess: true,
-    message: "success, Review updated successfully",
+    message: 'success, Review updated successfully',
     statusCode: 200,
-    data: review
+    data: review,
   });
 });
 
@@ -143,9 +144,9 @@ const deleteReview = asyncHandler(async (req, res) => {
 
   res.json({
     isSuccess: true,
-    message: "success, Review deleted successfully",
+    message: 'success, Review deleted successfully',
     statusCode: 200,
-    data: null
+    data: null,
   });
 });
 
@@ -154,5 +155,5 @@ module.exports = {
   getAllReviews,
   getOneReview,
   updateReview,
-  deleteReview
+  deleteReview,
 };
