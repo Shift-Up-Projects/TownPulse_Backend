@@ -79,6 +79,31 @@ app.use('/api/v1.0.0/activity', activityRoutes);
 app.use('/api/v1.0.0/reviews', reviewRoute);
 app.use('/api/v1.0.0/attendance', attendanceRoute);
 
+const swaggerJsdoc = require('swagger-jsdoc');
+const swaggerUi = require('swagger-ui-express');
+
+// Swagger configuration
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'TownPlus API',
+      version: '1.0.0',
+      description: 'TownPlus User Management API Documentation',
+    },
+    servers: [
+      {
+        url: 'http://localhost:7000',
+        description: 'Development server',
+      },
+    ],
+  },
+  apis: ['./swagger/*.js'], 
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
 // معالجة الروابط غير الموجودة
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
