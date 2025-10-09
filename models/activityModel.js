@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 const { ActivityStatus, CategoryType } = require('../utils/enum');
-const User=require('../models/userModel')
+const User = require('../models/userModel');
 const activitySchema = new mongoose.Schema(
   {
     title: {
@@ -77,6 +77,7 @@ const activitySchema = new mongoose.Schema(
     },
   },
   {
+    timestamps: true,
     versionKey: false,
   },
 );

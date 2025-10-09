@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
-const User=require('../models/userModel');
-const Activity=require('../models/activityModel');
+const User = require('../models/userModel');
+const Activity = require('../models/activityModel');
 const reviewSchema = new mongoose.Schema(
   {
     user_id: {
@@ -21,7 +21,7 @@ const reviewSchema = new mongoose.Schema(
     comment: {
       type: String,
       trim: true,
-    }
+    },
   },
   {
     timestamps: true,

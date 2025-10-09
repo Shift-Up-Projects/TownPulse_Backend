@@ -40,12 +40,11 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    created_at: {
-      type: Date,
-      default: Date.now(),
-    },
   },
-  { versionKey: false },
+  {
+    timestamps: true,
+    versionKey: false,
+  },
 );
 
 userSchema.pre('save', async function (next) {
@@ -59,7 +58,6 @@ userSchema.pre('save', function (next) {
   this.passwordChangedAt = Date.now() - 1000;
   next();
 });
-
 userSchema.methods.correctPassword = async function (
   candidatePassword,
   userPassword,
