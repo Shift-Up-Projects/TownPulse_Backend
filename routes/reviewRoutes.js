@@ -8,30 +8,30 @@ router.use(authMiddlewers.protect);
 router.post(
   '/',
   reviewMiddleware.validateCreateReview,
-  reviewController.createReview
+  reviewController.createReview,
 );
 router.get(
   '/',
   reviewMiddleware.validateQueryParams,
-  reviewController.getAllReviews
+  reviewController.getAllReviews,
 );
 router.get(
   '/:id',
   reviewMiddleware.validateReviewId,
-  reviewController.getOneReview
+  reviewController.getOneReview,
 );
 router.patch(
   '/:id',
   reviewMiddleware.validateReviewId,
   reviewMiddleware.checkReviewOwner,
   reviewMiddleware.validateUpdateReview,
-  reviewController.updateReview
+  reviewController.updateReview,
 );
 router.delete(
   '/:id',
   reviewMiddleware.validateReviewId,
   reviewMiddleware.checkReviewOwner,
-  reviewController.deleteReview
+  reviewController.deleteReview,
 );
 
 module.exports = router;

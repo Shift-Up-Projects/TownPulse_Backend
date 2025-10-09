@@ -4,13 +4,12 @@ const activityController = require('../controllers/activityController');
 const authMiddlewers = require('../middlewares/authMiddlewers');
 const activityMiddleware = require('../middlewares/activityMiddleware');
 
-
 router.use(authMiddlewers.protect);
 
 router.get(
   '/my/activities',
   activityMiddleware.validateQueryParams,
-  activityController.getMyActivities
+  activityController.getMyActivities,
 );
 
 router.get(
@@ -18,37 +17,37 @@ router.get(
   authMiddlewers.restrictTo('ADMIN', 'USER'),
   activityMiddleware.validateUserId,
   activityMiddleware.validateQueryParams,
-  activityController.getUserActivities
+  activityController.getUserActivities,
 );
 router.get(
   '/nearby',
   activityMiddleware.validateNearbySearch,
-  activityController.getNearbyActivities
+  activityController.getNearbyActivities,
 );
 router.get(
   '/',
   activityMiddleware.validateQueryParams,
-  activityController.getAllActivities
+  activityController.getAllActivities,
 );
 router.get('/:id', activityController.getActivity);
 router.post(
   '/',
   activityMiddleware.validateCreateActivity,
-  activityController.createActivity
+  activityController.createActivity,
 );
 
 router.delete(
-  '/:id', 
+  '/:id',
   authMiddlewers.restrictTo('ADMIN', 'USER'),
   activityMiddleware.checkActivityOwner,
-  activityController.deleteActivity
+  activityController.deleteActivity,
 );
 
 router.patch(
-  '/:id', 
+  '/:id',
   authMiddlewers.restrictTo('ADMIN', 'USER'),
   activityMiddleware.checkActivityOwner,
-  activityController.updateActivity
+  activityController.updateActivity,
 );
 
 module.exports = router;
