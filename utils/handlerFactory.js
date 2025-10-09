@@ -82,7 +82,7 @@ exports.getAll = (Model) =>
     return successResponse(
       res,
       200,
-      `success, عدد المستندات ${doc.length}`, // 👈🏽 الرسالة المطلوبة
+      `success, number of documents ${doc.length}`, // 👈🏽 الرسالة المطلوبة
       doc, // المستندات نفسها في حقل 'data'
     );
   });

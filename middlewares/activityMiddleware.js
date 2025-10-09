@@ -7,19 +7,21 @@ const AppError = require('../utils/appError');
 // ✅ دالة حساب المسافة باستخدام Haversine formula
 exports.calculateDistance = (lat1, lon1, lat2, lon2) => {
   const R = 6371; // نصف قطر الأرض بالكيلومتر
-  
+
   // تحويل الدرجات إلى راديان
-  const dLat = (lat2 - lat1) * Math.PI / 180;
-  const dLon = (lon2 - lon1) * Math.PI / 180;
-  
-  const a = 
-    Math.sin(dLat/2) * Math.sin(dLat/2) +
-    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-    Math.sin(dLon/2) * Math.sin(dLon/2);
-  
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const distance = R * c;
-  
+
   return distance;
 };
 
@@ -56,7 +58,7 @@ exports.checkActivityOwner = catchAsync(async (req, res, next) => {
   if (activity.creator.toString() !== req.user._id.toString()) {
     return res.status(403).json({
       isSuccess: false,
-      message:'You are not authorized to edit this event.',
+      message: 'You are not authorized to edit this event.',
       statusCode: 403,
       data: null,
     });
@@ -148,7 +150,10 @@ exports.validateCreateActivity = catchAsync(async (req, res, next) => {
   }
 
   // التحقق من صحة التواريخ
-  const dateError = validateActivityDates(req.body.start_date, req.body.end_date);
+  const dateError = validateActivityDates(
+    req.body.start_date,
+    req.body.end_date,
+  );
   if (dateError) {
     return res.status(400).json({
       isSuccess: false,
@@ -208,13 +213,23 @@ exports.validateCreateActivity = catchAsync(async (req, res, next) => {
 //  التحقق من صحة البيانات للتحديث
 exports.validateUpdateActivity = catchAsync(async (req, res, next) => {
   const allowedFields = [
-    'title', 'description', 'location', 'map_url', 
-    'latitude', 'longitude', 'start_date', 'end_date', 
-    'price', 'capacity', 'category'
+    'title',
+    'description',
+    'location',
+    'map_url',
+    'latitude',
+    'longitude',
+    'start_date',
+    'end_date',
+    'price',
+    'capacity',
+    'category',
   ];
 
   // التحقق من وجود حقول غير مسموح بها
-  const invalidFields = Object.keys(req.body).filter(field => !allowedFields.includes(field));
+  const invalidFields = Object.keys(req.body).filter(
+    (field) => !allowedFields.includes(field),
+  );
   if (invalidFields.length > 0) {
     return res.status(400).json({
       isSuccess: false,
@@ -225,7 +240,10 @@ exports.validateUpdateActivity = catchAsync(async (req, res, next) => {
   }
 
   // التحقق من صحة الفئة إذا تم إرسالها
-  if (req.body.category && !Object.values(CategoryType).includes(req.body.category)) {
+  if (
+    req.body.category &&
+    !Object.values(CategoryType).includes(req.body.category)
+  ) {
     return res.status(400).json({
       isSuccess: false,
       message: `الفئة غير صالحة. يجب أن تكون واحدة من: ${Object.values(CategoryType).join(', ')}`,
@@ -307,7 +325,6 @@ exports.validateUpdateActivity = catchAsync(async (req, res, next) => {
   next();
 });
 
-
 exports.validateUserId = catchAsync(async (req, res, next) => {
   const { userId } = req.params;
 
@@ -347,7 +364,6 @@ exports.restrictToAdmin = catchAsync(async (req, res, next) => {
   next();
 });
 
-
 exports.validateQueryParams = catchAsync(async (req, res, next) => {
   const { page, limit, status, category } = req.query;
 
@@ -365,7 +381,7 @@ exports.validateQueryParams = catchAsync(async (req, res, next) => {
   if (limit && (isNaN(limit) || parseInt(limit) < 1 || parseInt(limit) > 100)) {
     return res.status(400).json({
       isSuccess: false,
-      message:'The limit must be between 1 and 100.',
+      message: 'The limit must be between 1 and 100.',
       statusCode: 400,
       data: null,
     });
@@ -401,7 +417,7 @@ exports.validateNearbySearch = catchAsync(async (req, res, next) => {
   if (!lat || !lng) {
     return res.status(400).json({
       isSuccess: false,
-      message:'Latitude and longitude must be provided.',
+      message: 'Latitude and longitude must be provided.',
       statusCode: 400,
       data: null,
     });
@@ -432,7 +448,7 @@ exports.validateNearbySearch = catchAsync(async (req, res, next) => {
   if (distance < 0.1 || distance > 100) {
     return res.status(400).json({
       isSuccess: false,
-      message:'The distance should be between 0.1 and 100 kilometers.',
+      message: 'The distance should be between 0.1 and 100 kilometers.',
       statusCode: 400,
       data: null,
     });
