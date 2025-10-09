@@ -9,6 +9,13 @@ exports.RoleCode = {
   ORGANIZER: 'ORGANIZER',
 };
 
+exports.AttendanceStatus = {
+  PRESENT: 'present',
+  ABSENT: 'absent',
+  LATE: 'late',
+  EXCUSED: 'excused'
+};
+
 exports.ActivityStatus = {
   DRAFT: 'DRAFT',
   UPCOMING: 'UPCOMING',
@@ -16,7 +23,6 @@ exports.ActivityStatus = {
   COMPLETED: 'COMPLETED',
   CANCELLED: 'CANCELLED',
 };
-
 
 exports.CategoryType = {
   MUSIC: 'MUSIC',
