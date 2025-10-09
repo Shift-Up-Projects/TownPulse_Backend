@@ -71,11 +71,13 @@ app.use(compression());
 // 2) ROUTES
 const userRouter = require('./routes/userRouter');
 const activityRoutes = require('./routes/activityRoutes');
-const reviewRoute=require('./routes/reviewRoutes');
+const reviewRoute = require('./routes/reviewRoutes');
+const attendanceRoute = require('./routes/attendanceRouter');
 
 app.use('/api/v1.0.0/users', userRouter);
 app.use('/api/v1.0.0/activity', activityRoutes);
 app.use('/api/v1.0.0/reviews', reviewRoute);
+app.use('/api/v1.0.0/attendance', attendanceRoute);
 
 // معالجة الروابط غير الموجودة
 app.all('*', (req, res, next) => {
